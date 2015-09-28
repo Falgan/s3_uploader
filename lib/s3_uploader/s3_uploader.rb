@@ -14,6 +14,7 @@ module S3Uploader
       :path_style => false,
       :regexp => /.*/,
       :gzip => false,
+      :gzip_replace => false,
       :gzip_working_dir => nil,
       :time_range => Time.at(0)..(Time.now + (60 * 60 * 24))
     }.merge(options)
@@ -67,7 +68,8 @@ module S3Uploader
         if options[:gzip] && File.extname(f) != '.gz'
           dir, base = File.split(f)
           dir       = dir.sub(source, options[:gzip_working_dir])
-          gz_file   = "#{dir}/#{base}.gz"
+          gz_file   = "#{dir}/#{base}" if options[:gzip_replace]
+          gz_file   = "#{dir}/#{base}.gz" if !options[:gzip_replace]
 
           FileUtils.mkdir_p(dir) unless File.directory?(dir)
           Zlib::GzipWriter.open(gz_file) do |gz|
